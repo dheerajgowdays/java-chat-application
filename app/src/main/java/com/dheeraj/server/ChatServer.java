@@ -16,8 +16,8 @@ public class ChatServer {
             ServerSocket serverSocket = new ServerSocket(port);
             System.out.println("\nStarting server .....");
             System.out.println("\nServer listening on port: "+port);
+            System.out.println("\nWaiting for client connection ....");
             while (true) {
-                System.out.println("\nWaiting for client connection ....");
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("\nClient connected !");
                 System.out.println("\nClient IP :"+clientSocket.getInetAddress());

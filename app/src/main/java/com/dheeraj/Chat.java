@@ -12,10 +12,21 @@ public class Chat {
     }
 
     public static void main(String[] args) {
-        System.out.println(new Chat().getGreeting());
-        ChatServer chat = new ChatServer();
-        chat.server();
-        ChatClient client = new ChatClient();
-        client.client();
+        if(args.length==0){
+            System.out.println("Usage: ");
+            System.out.println("server");
+            System.out.println("client");
+        }
+        switch (args[0].toLowerCase()){
+            case "server":
+                new ChatServer().server();
+                break;
+            case "client":
+                new ChatClient().client();
+                break;
+            default:
+                System.out.println("Unknown command");
+        }
+
     }
 }
