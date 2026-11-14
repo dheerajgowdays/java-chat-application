@@ -48,3 +48,7 @@ application {
 //     classpath = sourceSets.main.runtimeClasspath
 //     mainClass = 'com.dheeraj.client.ChatClient'
 // }
+
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
+}
