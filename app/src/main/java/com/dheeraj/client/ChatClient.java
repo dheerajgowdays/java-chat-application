@@ -1,9 +1,15 @@
 package com.dheeraj.client;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public class ChatClient {
+    Scanner sc;
+    public ChatClient(Scanner sc) {
+        this.sc = sc;
+    }
     public void client() {
         System.out.println("======================");
         System.out.println("   MINI CHAT CLIENT");
@@ -16,6 +22,28 @@ public class ChatClient {
             System.out.println("Port: "+socket.getPort());
             System.out.println("\nConnected Successfully");
             System.out.println("\nConnection established with server");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("\n Connected to server! Type  a message (or /quit to exit):");
+            while(true){
+                System.out.println("\n> ");
+                String message = sc.nextLine();
+                if(message.equals("/quit")){
+                    writer.write("Goodbye!");
+                    writer.newLine();
+                    writer.flush();
+                    break;
+                }
+                writer.write(message);
+                writer.newLine();
+                writer.flush();
+
+                String serverResponse = reader.readLine();
+                if(serverResponse == null){
+                    System.out.println("Server closed the connection");
+                }
+            }
         } catch (IOException e) {
             System.err.println("Connection failed By: "+e.getMessage());
         }

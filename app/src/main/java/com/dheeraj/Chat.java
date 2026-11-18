@@ -6,12 +6,15 @@ package com.dheeraj;
 import com.dheeraj.client.ChatClient;
 import com.dheeraj.server.ChatServer;
 
+import java.util.Scanner;
+
 public class Chat {
     public String getGreeting() {
         return "Hello World!";
     }
 
     public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
         if(args.length==0){
             System.out.println("Usage: ");
             System.out.println("server");
@@ -22,7 +25,7 @@ public class Chat {
                 new ChatServer().server();
                 break;
             case "client":
-                new ChatClient().client();
+                new ChatClient(sc).client();
                 break;
             default:
                 System.out.println("Unknown command");
