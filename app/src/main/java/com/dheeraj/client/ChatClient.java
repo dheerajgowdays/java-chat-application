@@ -18,16 +18,24 @@ public class ChatClient {
         try{
             System.out.println("\nConnecting to server...");
             Socket socket = new Socket("localHost",port);
-            System.out.println("\nHost: "+socket.getInetAddress().getHostName());
-            System.out.println("Port: "+socket.getPort());
-            System.out.println("\nConnected Successfully");
-            System.out.println("\nConnection established with server");
+            System.out.println("localhost:"+port);
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("\n Connected to server! Type  a message (or /quit to exit):");
-            while(true){
-                System.out.println("\n> ");
+            
+            Thread listenerThread = new Thread(() ->{
+                try {
+                    String line;
+                    while((line = reader.readLine()) != null){
+                        System.out.println(line);
+                    }
+                } catch (IOException ignored) {
+                }
+            });
+            listenerThread.setDaemon(true);
+            listenerThread.start();
+
+            while(sc.hasNextLine()){
+                System.out.print("\n> ");
                 String message = sc.nextLine();
                 if(message.equals("/quit")){
                     writer.write("Goodbye!");
@@ -38,7 +46,6 @@ public class ChatClient {
                 writer.write(message);
                 writer.newLine();
                 writer.flush();
-
                 String serverResponse = reader.readLine();
                 if(serverResponse == null){
                     System.out.println("Server closed the connection");
