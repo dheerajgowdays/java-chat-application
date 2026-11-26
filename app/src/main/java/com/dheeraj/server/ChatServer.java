@@ -7,15 +7,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.dheeraj.manager.ClientManager;
+import com.dheeraj.manager.NicknameManager;
+
 public class ChatServer {
 
     private static final int port = 5000;
     private static final  int poolSize = 10;
+
     private volatile boolean serverRunning = false;
     private ServerSocket serverSocket;
     private ExecutorService executor;
-    private final AtomicInteger clientIdGenerator  = new AtomicInteger(0);
-    private final AtomicInteger activeConnections = new AtomicInteger(0);
+
+    private final NicknameManager nicknameManager = new NicknameManager();
+    private final ClientManager clientManager = new ClientManager(nicknameManager);
     
     public void server(){
         System.out.println("==============================");
@@ -26,14 +31,14 @@ public class ChatServer {
         try {
             serverSocket = new ServerSocket(port);
             serverRunning = true;
-            System.out.println("\nStarting server .....");
-            System.out.println("\nServer listening on port: "+port);
+            System.out.println("\n[SERVER] Initializing Chat Server...");
+            System.out.println("[SERVER] Port        :"+port);
+            System.out.println("[SERVER] Status      : RUNNING");
+            System.out.println("[SERVER] Thread Pool :"+poolSize);
             System.out.println("\n[SERVER] waiting for connections ...");
             while(serverRunning) {
-                Socket clintSocket = serverSocket.accept();
-                int clientId = clientIdGenerator.incrementAndGet();
-                int currentActive = activeConnections.incrementAndGet();
-                ClientHandler clientHandler = new ClientHandler(clintSocket,clientId,currentActive,this);
+                Socket clintSocket = serverSocket.accept();                
+                ClientHandler clientHandler = new ClientHandler(clintSocket,nicknameManager,clientManager);
                 executor.execute(clientHandler);
                 
             }
@@ -44,10 +49,6 @@ public class ChatServer {
         } finally {
             shutdownServer();
         }
-    }
-    public void onClientDisconnected(int clientId){
-        int remaining = activeConnections.decrementAndGet();
-        System.out.println("\n[DISCONNECTED] Client ID: "+clientId+" | Active connections: "+remaining);
     }
     public void shutdownServer(){
         serverRunning = false;
